@@ -9,15 +9,21 @@ library(geojsonio)
 #geocodage du fichier avec https://adresse.data.gouv.fr/csv
 
 dvf<-read.csv2("dvf_propre.geocoded.csv",sep=";")
+
 dvf<-dvf %>% 
-  mutate(Date_mutation_d=dmy(Date_mutation), 
+  mutate(
+  Date_mutation_d=dmy(Date_mutation), 
   Code_departement=sprintf("%02d", Code_departement)
   )%>% 
   mutate( periode=format(Date_mutation_d,"%Y%m"))
 
-kpi1<-dvf %>% filter(year(Date_mutation_d)=="2019") %>% count 
-(kpi2<-dvf %>% filter(year(Date_mutation_d)=="2019" & Type_local=="Appartement") %>% summarize(prix_m2_mean=mean(prix_m2)))
-(kpi3<-dvf %>% filter(year(Date_mutation_d)=="2019" & Type_local=="Maison") %>% summarize(prix_m2_mean=mean(prix_m2)))
+
+
+(kpi1<-dvf %>% filter(year(Date_mutation_d)=="2019") %>% count)
+(kpi2<-dvf %>% filter(year(Date_mutation_d)=="2019" & Type_local=="Appartement") %>%
+    summarize(prix_m2_mean=mean(prix_m2)))
+(kpi3<-dvf %>% filter(year(Date_mutation_d)=="2019" & Type_local=="Maison") %>%
+    summarize(prix_m2_mean=mean(prix_m2)))
 
 prix_m2.dpt<-dvf %>% group_by(Code_departement) %>% summarize(prix_m2_mean=mean(prix_m2))
 (prix_m2.commune<-dvf %>% group_by(result_citycode) %>% summarize(prix_m2_mean=mean(prix_m2)))

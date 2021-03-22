@@ -28,10 +28,14 @@ dvf<-dvf %>%
   )%>% 
   mutate( periode=format(Date_mutation_d,"%Y%m"))
 
-kpi1<-dvf %>% filter(year(Date_mutation_d)=="2019") %>% count 
-kpi2<-dvf %>% filter(year(Date_mutation_d)=="2019" & Type_local=="Appartement") %>% summarize(prix_m2_mean=round(mean(prix_m2),0))
-kpi3<-dvf %>% filter(year(Date_mutation_d)=="2019" & Type_local=="Maison") %>% summarize(prix_m2_mean=round(mean(prix_m2),0))
+kpi1<-dvf %>% filter(year(Date_mutation_d)=="2018") %>% count 
+kpi2<-dvf %>% filter(year(Date_mutation_d)=="2018" & Type_local=="Appartement") %>% summarize(prix_m2_mean=round(mean(prix_m2),0))
+kpi3<-dvf %>% filter(year(Date_mutation_d)=="2018" & Type_local=="Maison") %>% summarize(prix_m2_mean=round(mean(prix_m2),0))
 
+
+kpi1.2019<-dvf %>% filter(year(Date_mutation_d)=="2019") %>% count 
+kpi2.2019<-dvf %>% filter(year(Date_mutation_d)=="2019" & Type_local=="Appartement") %>% summarize(prix_m2_mean=round(mean(prix_m2),0))
+kpi3.2019<-dvf %>% filter(year(Date_mutation_d)=="2019" & Type_local=="Maison") %>% summarize(prix_m2_mean=round(mean(prix_m2),0))
 ```
 
 Page 1
@@ -40,7 +44,7 @@ Page 1
 Row
 -----------------------------------------------------------------------
 
-### Nb de ventes 2019
+### Nb de ventes 2018
 
 ```{r echo=FALSE}
 valueBox(kpi1,icon="fa-hands-helping")
@@ -58,23 +62,44 @@ valueBox(paste0(kpi2," €"),icon="fa-building")
 valueBox(paste0(kpi3," €"),icon="fa-home")
 ```
 
+Row
+-----------------------------------------------------------------------
+
+### Nb de ventes 2019
+
+```{r echo=FALSE}
+valueBox(kpi1.2019,icon="fa-hands-helping",color="warning")
+```
+
+### Prix m2 Appartement
+
+```{r echo=FALSE}
+valueBox(paste0(kpi2.2019," €"),icon="fa-football-ball")
+```
+
+### Prix m2 Maison
+
+```{r echo=FALSE}
+valueBox(paste0(kpi3.2019," €"),icon="fa-home")
+```
 
 Row
 -----------------------------------------------------------------------
-### Ventes mensuelles
+### Prix de vente / mois
 ```{r echo=FALSE}
-dvf %>% group_by(periode) %>% summarise(n=n()) %>% 
-    plot_ly(x = ~periode, y = ~n, type='scatter',mode = 'lines')%>%
-  layout(yaxis = list(range = c(0, 8000)))
+dvf %>% group_by(periode) %>%
+  summarise(mean_val_fonc=mean(Valeur_fonciere)) %>% 
+  plot_ly(x = ~periode, y = ~mean_val_fonc, type='scatter',mode = 'lines')%>%
+  layout(yaxis = list(range = c(0, 250000)))
 
 ```
 
-### Répartition maison / appartement
+### Ventes/mois
 ```{r echo=FALSE}
-dvf %>% 
-  group_by(periode,Type_local) %>%
+dvf %>% group_by(periode) %>%
   summarise(n=n()) %>% 
-    plot_ly(x = ~periode, y = ~n,type='bar',color=~Type_local)
+  plot_ly(x = ~periode, y = ~n, type='scatter',mode = 'lines')%>%
+  layout(yaxis = list(range = c(0, 7000)))
 ```
 
 
@@ -113,9 +138,10 @@ Page 3
 ===================================== 
 
 ```{r echo = FALSE}
-data<-dvf %>% filter(Code_departement=="79") %>% dplyr::select(latitude,longitude,Valeur_fonciere,Type_local)
+data<-dvf %>% 
+  dplyr::select(latitude,longitude,Valeur_fonciere,Type_local)
 
-bins <- c(0,50000,100000,125000,150000, 300000, Inf)
+bins <- c(0,100000,200000,400000, Inf)
 pal <- colorBin("YlOrRd", domain =dpt.plus.prixm2$prix_m2_mean , bins = bins)
 
 leaflet(data) %>% addTiles() %>%
@@ -124,4 +150,10 @@ leaflet(data) %>% addTiles() %>%
                    color = ~pal(Valeur_fonciere))
 
 ```
+
+Page 4
+===================================== 
+
+Page 5
+===================================== 
 
